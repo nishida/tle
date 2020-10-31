@@ -1,0 +1,10 @@
+__pycache__
+*.csv.gz
+*.pyc
+*.pyo
+*.png
+.ipynb_checkpoints/
+spacetrackaccount.py
+python38-tle/
+download/*
+!.gitkeep
