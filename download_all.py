@@ -11,12 +11,15 @@ import subprocess
 from subprocess import PIPE
 import spacetrackaccount
 
-if len(sys.argv) != 3:
+if len(sys.argv) == 3 :
+    start = int(sys.argv[1])
+    end = int(sys.argv[2])
+elif len(sys.argv) == 2 :
+    start = int(sys.argv[1])
+    end = int(sys.argv[1])
+else :
     print('Invalid number of arguments!')
     sys.exit(0)
-
-start = int(sys.argv[1])
-end = int(sys.argv[2])
 
 st = SpaceTrackClient(spacetrackaccount.userid, spacetrackaccount.password)
 
@@ -35,7 +38,9 @@ for i in range(start, end + 1):
     proc = subprocess.Popen(['xz', '-9', file], stdout=PIPE, stderr=PIPE, text=True)
 
     # Limit API queries to less than 30 requests per minute / 300 requests per hour
-    time.sleep(12)
+    if i != end :
+        time.sleep(12)
+
     (stdout, stderr) = proc.communicate()
 
     if stdout != '' or stderr != '' :
