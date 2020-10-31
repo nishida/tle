@@ -7,6 +7,8 @@ import pandas as pd
 import json
 import time
 import sys
+import subprocess
+from subprocess import PIPE
 import spacetrackaccount
 
 if len(sys.argv) != 3:
@@ -30,7 +32,15 @@ for i in range(start, end + 1):
     file = 'download/{}.json'.format(i)
     with open(file, 'w') as fp:
         fp.write(data)
+    proc = subprocess.Popen(['xz', '-9', file], stdout=PIPE, stderr=PIPE, text=True)
+
     # Limit API queries to less than 30 requests per minute / 300 requests per hour
     time.sleep(12)
+    (stdout, stderr) = proc.communicate()
+
+    if stdout != '' or stderr != '' :
+        print(stdout, stderr)
+        sys.exit(0)
 
 sys.exit(1)
+
