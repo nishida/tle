@@ -3,8 +3,6 @@
 
 import spacetrack.operators as op
 from spacetrack import SpaceTrackClient
-import pandas as pd
-import json
 import time
 import sys
 import subprocess
