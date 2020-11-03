@@ -40,6 +40,7 @@ Keras==2.4.3
 Keras-Preprocessing==1.1.2
 kiwisolver==1.2.0
 Logbook==1.5.3
+lxml==4.6.1
 Markdown==3.3.3
 MarkupSafe==1.1.1
 matplotlib==3.3.2
@@ -105,3 +106,4 @@ webencodings==0.5.1
 Werkzeug==1.0.1
 widgetsnbextension==3.5.1
 wrapt==1.12.1
+xmljson==0.2.1
