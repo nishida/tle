@@ -15,14 +15,14 @@ space-track.org から軌道要素データを取得する。
 
 tle API を用いて衛星番号30000から30009の過去の軌道要素データをJSONとCSV形式で取得する:
 
-    $ ./download_json_all.py 30000 30009
-    $ ./download_csv_all.py 30000 30009
+    $ ./download_tle_satcat_json.py 30000 30009
+    $ ./download_tle_satcat_csv.py 30000 30009
 
 #### 日付を指定して取得
 
 gp_history API を用いて2019年1月12日から18日までの全ての軌道要素データをJSON形式で取得する:
 
-    $ ./download_json_day.py 2019/1/12 2019/1/18
+    $ ./download_gp_date_json.py 2019/1/12 2019/1/18
 
 tle API を使った場合と項目名が異なることに注意。
 

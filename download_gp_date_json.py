@@ -11,18 +11,19 @@ import subprocess
 from subprocess import PIPE
 import spacetrackaccount
 
+# Limit API queries to less than 30 requests per minute / 300 requests per hour
+mininterval = 12 # sec
+
 def showusage():
     print('Usage: {} YYYY-MM-DD [YYYY-MM-DD]'.format(sys.argv[0]))
 
-
-
-if len(sys.argv) == 3 :
+if len(sys.argv) == 3:
     start = parser.parse(sys.argv[1], yearfirst=True)
     end = parser.parse(sys.argv[2], yearfirst=True)
-elif len(sys.argv) == 2 :
+elif len(sys.argv) == 2:
     start = parser.parse(sys.argv[1], yearfirst=True)
     end = start
-else :
+else:
     print('Invalid number of arguments!')
     showusage()
     sys.exit(0)
@@ -38,7 +39,7 @@ ndays = (end - start).days + 1
 
 print('Start:', start.strftime('%Y-%m-%d'))
 print('End:', end.strftime('%Y-%m-%d'))
-print('Days:', ndays)
+print('Number of Days:', ndays)
 
 st = SpaceTrackClient(spacetrackaccount.userid, spacetrackaccount.password)
 
@@ -53,22 +54,22 @@ for day in (start + timedelta(days=i) for i in range(ndays)):
 
     nextday = day + timedelta(days=1)
 
+    time1 = time.monotonic()
     data = st.gp_history(epoch=[op.inclusive_range(day.strftime('%Y-%m-%d'), nextday.strftime('%Y-%m-%d'))], 
         orderby=['norad_cat_id', 'epoch'], format='json')
     file = 'download/{}.json'.format(day.strftime('%Y%m%d'))
     with open(file, 'w') as fp:
         fp.write(data)
+
     proc = subprocess.Popen(['xz', '-9', file], stdout=PIPE, stderr=PIPE, text=True)
-
-    # Limit API queries to less than 30 requests per minute / 300 requests per hour
-    if day != (start + timedelta(days = (ndays - 1))):
-        time.sleep(12)
-
     (stdout, stderr) = proc.communicate()
-
-    if stdout != '' or stderr != '' :
+    if stdout != '' or stderr != '':
         print(stdout, stderr)
         sys.exit(0)
+
+    delta = time.monotonic() - time1
+    if delta < mininterval and day != (start + timedelta(days = (ndays - 1))):
+        time.sleep(mininterval - delta)
 
 sys.exit(1)
 
