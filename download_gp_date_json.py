@@ -19,7 +19,6 @@ MAX_RETRY = 2
 MIN_INTERVAL = 12 # sec
 
 def getdata(st, epoch, logger = None):
-    from pprint import pprint
     for i in range(MAX_RETRY + 1):
         if i > 0:
             logger.warning('Retry {}/{} for {}'.format(i, MAX_RETRY, epoch))
