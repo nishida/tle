@@ -15,7 +15,7 @@ p = re.compile(r'(?:\.json)?(?:\.gz|\.bz2|\.xz|\.zip)?$')
 for jsonfile in sys.argv[1:]: 
     print('Input:', jsonfile)
     tlefile = p.sub('', jsonfile) + '.tle'
-    df = pd.read_json(jsonfile, orient='records')
+    df = pd.read_json(jsonfile, orient='records', , dtype='object')
     print(len(df), 'records read')
     if len(df) == 0:
         print('No output')
