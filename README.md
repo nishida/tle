@@ -13,10 +13,9 @@ space-track.org から軌道要素データを取得する。
 
 #### Satellite Catalog Number を指定して取得
 
-tle API を用いて衛星番号30000から30009の過去の軌道要素データをJSONとCSV形式で取得する:
+tle API を用いて衛星番号30000から30009の過去の軌道要素データをJSON形式で取得する:
 
     $ ./download_tle_satcat_json.py 30000 30009
-    $ ./download_tle_satcat_csv.py 30000 30009
 
 #### 日付を指定して取得
 
