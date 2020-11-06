@@ -2,11 +2,11 @@ __pycache__
 *.pyc
 *.pyo
 *.png
-*.log
-log
 .ipynb_checkpoints/
 Untitled*.ipynb
 spacetrackaccount.py
 python38-tle/
+db/*
+log/*
 download/*
 !.gitkeep
