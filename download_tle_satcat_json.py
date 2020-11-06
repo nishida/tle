@@ -5,6 +5,7 @@ import spacetrack.operators as op
 from spacetrack import SpaceTrackClient
 import time
 import sys
+import math
 import subprocess
 from subprocess import PIPE
 import requests
@@ -17,7 +18,6 @@ MAX_RETRY = 2
 MIN_INTERVAL = 12 # sec
 
 def getdata(st, norad_cat_id, logger = None):
-    from pprint import pprint
     for i in range(MAX_RETRY + 1):
         if i > 0:
             logger.warning('Retry {}/{} for NORAD Catalog Number {}'.format(i, MAX_RETRY, norad_cat_id))
@@ -71,46 +71,59 @@ def savedata(data, filename, compress = True, logger = None):
 def main():
     logger = setup_logger('download_tle_satcat_json')
 
-    if len(sys.argv) == 3:
+    if len(sys.argv) == 4:
         start = int(sys.argv[1])
         end = int(sys.argv[2])
+        unit = int(sys.argv[3])
+    elif len(sys.argv) == 3:
+        start = int(sys.argv[1])
+        end = int(sys.argv[2])
+        unit = 1
     elif len(sys.argv) == 2:
         start = int(sys.argv[1])
         end = int(sys.argv[1])
+        unit = 1
     else:
         logger.critical('Invalid number of arguments!')
-        print('Usage: {} NORAD_Catalog_Number [NORAD_Catalog_Number]'.format(sys.argv[0]))
+        print('Usage: {} NORAD_Catalog_Number [NORAD_Catalog_Number [Unit]]'.format(sys.argv[0]))
         sys.exit(0)
 
     if end < start:
         start, end = end, start
 
     nsats = end - start + 1
+    nfiles = math.ceil(nsats / unit)
 
-    print('Start: {}'.format(start))
-    print('End: {}'.format(end))
-    print('Number of Satellites: {}'.format(nsats))
+    logger.info('Start: {}'.format(start))
+    logger.info('End: {}'.format(end))
+    logger.info('Number of Satellites: {}'.format(nsats))
+    logger.info('Number of Files: {}'.format(nfiles))
 
     st = SpaceTrackClient(spacetrackaccount.userid, spacetrackaccount.password)
 
     error_count = 0
 
-    for i in range(start, end + 1):
-        logger.info('Downloading NORAD Catalog Number {} ({}/{})'.format(i, i - start + 1, nsats))
+    for i in range(0, nfiles):
+        if unit == 1:
+            norad_cat_id = start + i
+        else:
+            norad_cat_id = op.inclusive_range(start + i * unit, min(start + (i + 1) * unit - 1, end))
 
-        data = getdata(st, i, logger=logger)
+        logger.info('Downloading NORAD Catalog Number {} ({}/{})'.format(norad_cat_id, i + 1, nfiles))
+
+        data = getdata(st, norad_cat_id, logger=logger)
 
         if data is None:
-            logger.warning("Error: Fail to download data for NORAD Catalog Number {}".format(i))
+            logger.warning("Error: Fail to download data for NORAD Catalog Number {}".format(norad_cat_id))
             error_count += 1
             if error_count >= MAX_ERROR:
                 logger.critical("The number of errors reaches its Maximum Error Count")
                 sys.exit(0)
         else:
-            filename = 'download/{}.json'.format(i)
+            filename = 'download/{}.json'.format(norad_cat_id)
             result = savedata(data, filename, logger = logger)
             if not result:
-                logger.critical("Error: Fail to save data for NORAD Catalog Number {}".format(i))
+                logger.critical("Error: Fail to save data for NORAD Catalog Number {}".format(norad_cat_id))
                 sys.exit(0)
 
     sys.exit(1)
