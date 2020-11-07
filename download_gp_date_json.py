@@ -37,7 +37,7 @@ def getdata(st, epoch, logger = None):
         except requests.HTTPError as e:
             # Critical error. Don't retry
             logger.debug('Response Time: %f secs', time.monotonic() - getdata.lasttime)
-            logger.critical('HTTPError: ' + str(e))
+            logger.error('HTTPError: ' + str(e))
             break
 
         except (requests.ConnectionError, requests.Timeout) as e:
@@ -64,7 +64,7 @@ def savedata(data, filename, compress = True, logger = None):
     proc = subprocess.Popen(['xz', '-9', filename], stdout=PIPE, stderr=PIPE, text=True)
     (stdout, stderr) = proc.communicate()
     if stdout != '' or stderr != '':
-        logger.critical(stdout + stderr)
+        logger.error(stdout + stderr)
         return False
     else:
         return True
@@ -81,7 +81,7 @@ def main():
     else:
         logger.critical('Invalid number of arguments!')
         print('Usage: {} YYYY-MM-DD [YYYY-MM-DD]'.format(sys.argv[0]))
-        sys.exit(0)
+        sys.exit(1)
 
     start = datetime(start.year, start.month, start.day)
     end = datetime(end.year, end.month, end.day)
@@ -97,6 +97,9 @@ def main():
 
     st = SpaceTrackClient(spacetrackaccount.userid, spacetrackaccount.password)
 
+    starttime = time.monotonic()
+    tsize = 0
+    tfiles = 0
     error_count = 0
 
     for day in (start + timedelta(days=i) for i in range(ndays)):
@@ -107,19 +110,27 @@ def main():
         data = getdata(st, epoch, logger = logger)
     
         if data is None:
-            logger.warning("Error: Fail to download data for " + epoch)
+            logger.error("Error: Fail to download data for " + epoch)
             error_count += 1
-            if error_count >= MAX_ERROR:
-                logger.critical("The number of errors reaches its Maximum Error Count")
-                sys.exit(0)
         else:
+            tsize += len(data)
+            tfiles += 1
             filename = 'download/{}.json'.format(day.strftime('%Y%m%d'))
             result = savedata(data, filename, logger = logger)
             if not result:
-                logger.critical("Error: Fail to save data for " + epoch)
-                sys.exit(0)
-    
-    sys.exit(1)
+                logger.error("Error: Fail to save data for {}".format(epoch))
+                error_count += 1
+
+        if error_count >= MAX_ERROR:
+            break
+
+    if error_count > 0:
+        logger.error("The number of errors is {}".format(error_count))
+    if error_count >= MAX_ERROR:
+        logger.critical("The number of errors reaches its Maximum Error Count")
+
+    logger.info("Downloaded: {} files, {} bytes in {} sec".format(tfiles , tsize, int(time.monotonic() - starttime)))
+    sys.exit(0 if error_count == 0 else 1)
 
 if __name__ == '__main__':
     main()
