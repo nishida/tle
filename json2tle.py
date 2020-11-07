@@ -8,7 +8,7 @@ import re
 
 if len(sys.argv) < 2:
     print('Invalid number of arguments!')
-    sys.exit(0)
+    sys.exit(1)
 
 p = re.compile(r'(?:\.json)?(?:\.gz|\.bz2|\.xz|\.zip)?$')
 
@@ -27,5 +27,5 @@ for jsonfile in sys.argv[1:]:
                 fp.write(line1 + "\n")
                 fp.write(line2 + "\n")
 
-sys.exit(1)
+sys.exit(0)
 
