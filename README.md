@@ -33,9 +33,9 @@ gp_history API を用いてEPOCHが2019年1月12日から18日までの全ての
 
     $ ./download_gp_date_json.py 2019/1/12 2019/1/18
 
-上記の例ではクエリの都合上、EPOCH が2019/1/19 00:00:00.000000 のデータも含まれることに注意。
+上記の例ではクエリの都合上、もし、EPOCH が2019/1/19 00:00:00.000000 のデータが存在した場合、それも含まれることに注意。
 
-gp_history API と tle API を使った場合と項目名が一部異なる。
+gp_history API と tle API を使った場合とでは項目名が一部異なる。
 
 #### CSVに変換
 
@@ -55,6 +55,6 @@ JSONファイルから、TLEを取り出す。JSONファイルは圧縮されて
 - `spacetracktest1-gp.ipynb1` gp, gp_history APIを用いたダウンロードのテスト
 - `spacetracktest2.ipynb` ダウンロードしたデータをプロット
 - `spacetracktest3.ipynb` ダウンロードしたデータをプロット
-
-
+- `spacetracktest3-gp.ipynb` ダウンロードしたデータをプロット (gp_history API)
+- `dbtest1.ipynb` SQLite3格納のテスト
 
