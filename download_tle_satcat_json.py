@@ -53,7 +53,7 @@ def getdata(st, norad_cat_id, logger = None):
 
 getdata.lasttime = 0
 
-def savedata(data, filename, compress = False, logger = None):
+def savedata(data, filename, compress = True, logger = None):
     with open(filename, 'w') as fp:
         fp.write(data)
 
