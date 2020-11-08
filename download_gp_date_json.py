@@ -7,6 +7,7 @@ from dateutil import parser
 from datetime import datetime, timedelta
 import time
 import sys
+import math
 import subprocess
 from subprocess import PIPE
 import requests
@@ -72,15 +73,21 @@ def savedata(data, filename, compress = True, logger = None):
 def main():
     logger = setup_logger('download_gp_date_json')
 
-    if len(sys.argv) == 3:
+    if len(sys.argv) == 4:
         start = parser.parse(sys.argv[1], yearfirst=True)
         end = parser.parse(sys.argv[2], yearfirst=True)
+        unit = int(sys.argv[3])
+    elif len(sys.argv) == 3:
+        start = parser.parse(sys.argv[1], yearfirst=True)
+        end = parser.parse(sys.argv[2], yearfirst=True)
+        unit = 1
     elif len(sys.argv) == 2:
         start = parser.parse(sys.argv[1], yearfirst=True)
         end = start
+        unit = 1
     else:
         logger.critical('Invalid number of arguments!')
-        print('Usage: {} YYYY-MM-DD [YYYY-MM-DD]'.format(sys.argv[0]))
+        print('Usage: {} YYYY-MM-DD [YYYY-MM-DD [Days]]'.format(sys.argv[0]))
         sys.exit(1)
 
     start = datetime(start.year, start.month, start.day)
@@ -90,10 +97,12 @@ def main():
         start, end = end, start
 
     ndays = (end - start).days + 1
+    nfiles = math.ceil(ndays / unit)
 
     logger.info('Start: ' +  start.strftime('%Y-%m-%d'))
     logger.info('End: ' + end.strftime('%Y-%m-%d'))
-    logger.info('Number of Days: ' + str(ndays))
+    logger.info('Number of Days: {}'.format(str(ndays)))
+    logger.info('Number of Files: {}'.format(nfiles))
 
     st = SpaceTrackClient(spacetrackaccount.userid, spacetrackaccount.password)
 
@@ -102,23 +111,31 @@ def main():
     tfiles = 0
     error_count = 0
 
-    for day in (start + timedelta(days=i) for i in range(ndays)):
-        logger.info('Downloading ' + day.strftime('%Y-%m-%d'))
-    
-        nextday = day + timedelta(days=1)
-        epoch = op.inclusive_range(day.strftime('%Y-%m-%d'), nextday.strftime('%Y-%m-%d'))
+    for i in range(0, nfiles):
+        day1 = start + timedelta(days = i * unit)
+        day2 = min(day1 + timedelta(days = unit - 1), end)
+        epoch = op.inclusive_range(day1.strftime('%Y-%m-%d'), (day2 + timedelta(days = 1)).strftime('%Y-%m-%d'))
+
+        if day1 == day2:
+            epoch_to_show = day1.strftime('%Y-%m-%d')
+            filename = 'download/{}.json'.format(day1.strftime('%Y%m%d'))
+        else:
+            epoch_to_show = '{}--{}'.format(day1.strftime('%Y-%m-%d'), day2.strftime('%Y-%m-%d'))
+            filename = 'download/{}-{}.json'.format(day1.strftime('%Y%m%d'), day2.strftime('%Y%m%d'))
+
+        logger.info('Downloading {} ({}/{})'.format(epoch_to_show, i + 1, nfiles))
+
         data = getdata(st, epoch, logger = logger)
     
         if data is None:
-            logger.error("Error: Fail to download data for " + epoch)
+            logger.error("Error: Fail to download data for " + epoch_to_show)
             error_count += 1
         else:
             tsize += len(data)
             tfiles += 1
-            filename = 'download/{}.json'.format(day.strftime('%Y%m%d'))
             result = savedata(data, filename, logger = logger)
             if not result:
-                logger.error("Error: Fail to save data for {}".format(epoch))
+                logger.error("Error: Fail to save data for {}".format(epoch_to_show))
                 error_count += 1
 
         if error_count >= MAX_ERROR:
