@@ -107,10 +107,15 @@ def main():
     error_count = 0
 
     for i in range(0, nfiles):
-        if unit == 1:
-            norad_cat_id = start + i
+        id1 = start + i * unit
+        id2 = min(start + (i + 1) * unit - 1, end)
+
+        if id1 == id2:
+            norad_cat_id = id1
+            filename = 'download/{}.json'.format(norad_cat_id)
         else:
-            norad_cat_id = op.inclusive_range(start + i * unit, min(start + (i + 1) * unit - 1, end))
+            norad_cat_id = op.inclusive_range(id1, id2)
+            filename = 'download/{}-{}.json'.format(id1, id2)
 
         logger.info('Downloading NORAD Catalog Number {} ({}/{})'.format(norad_cat_id, i + 1, nfiles))
 
@@ -122,7 +127,6 @@ def main():
         else:
             tsize += len(data)
             tfiles += 1
-            filename = 'download/{}.json'.format(norad_cat_id)
             result = savedata(data, filename, logger = logger)
             if not result:
                 logger.error("Error: Fail to save data for NORAD Catalog Number {}".format(norad_cat_id))
