@@ -50,6 +50,7 @@ nbconvert==6.0.7
 nbformat==5.0.8
 nest-asyncio==1.4.2
 notebook==6.1.4
+numexpr==2.7.1
 numpy==1.18.5
 oauthlib==3.1.0
 opt-einsum==3.3.0
@@ -90,6 +91,7 @@ sgp4==2.13
 six==1.15.0
 sklearn==0.0
 spacetrack==0.15.0
+tables==3.6.1
 tensorboard==2.3.0
 tensorboard-plugin-wit==1.7.0
 tensorflow==2.3.1
