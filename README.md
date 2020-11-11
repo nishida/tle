@@ -43,6 +43,12 @@ JSONファイルをCSVファイルに変換する。JSONファイルは圧縮さ
 
     $ ./json2csv.py 2020-10-10.json.xz
 
+#### 複数のファイルをまとめてParquetに変換
+
+複数のJSONファイルを `pandas.DataFrame` として読み込み、Parquetファイルに変換する。JSONファイルは圧縮されていても可。出力されるファイルは最後に指定する。Parquet ファイルの圧縮方法は `-c` オプションで指定でき、`pandas.DataFrame.to_parquet` がサポートする圧縮方式をサポートする(デフォルトは snappy)。
+
+    $ ./json2parquet.py -c zstd download/*.json.xz out.parquet.zstd
+
 #### TLEを取り出す
 
 JSONファイルから、TLEを取り出す。JSONファイルは圧縮されていても可。出力されるファイルの拡張子は `.tle` となる。
