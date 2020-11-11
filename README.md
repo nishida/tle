@@ -4,7 +4,8 @@ space-track.org から軌道要素データを取得する。
 
 ## 環境
 - Python 3.7以降
-- pandas, spacetrack, sgp4, xmljson, jupyter
+- pandas, spacetrack
+- (Jupyter Notebook の各ファイルを実行するには) sgp4, xmljson, pyarrow, tables
 
 ## 使い方
 
@@ -44,6 +45,8 @@ JSONファイルをCSVファイルに変換する。JSONファイルは圧縮さ
     $ ./json2csv.py 2020-10-10.json.xz
 
 #### 複数のファイルをまとめてParquetに変換
+
+注: gp, gp_latest APIでダウンロードしたJSONファイルのみに対応
 
 複数のJSONファイルを `pandas.DataFrame` として読み込み、Parquetファイルに変換する。JSONファイルは圧縮されていても可。出力されるファイルは最後に指定する。Parquet ファイルの圧縮方法は `-c` オプションで指定でき、`pandas.DataFrame.to_parquet` がサポートする圧縮方式をサポートする(デフォルトは snappy)。
 
