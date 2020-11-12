@@ -62,8 +62,9 @@ JSONファイルから、TLEを取り出す。JSONファイルは圧縮されて
 
 - `spacetracktest1.ipynb` tle, tle_latest APIを用いたダウンロードのテスト
 - `spacetracktest1-gp.ipynb1` gp, gp_history APIを用いたダウンロードのテスト
-- `spacetracktest2.ipynb` ダウンロードしたデータをプロット
-- `spacetracktest3.ipynb` ダウンロードしたデータをプロット
-- `spacetracktest3-gp.ipynb` ダウンロードしたデータをプロット (gp_history API)
+- `spacetracktest2.ipynb` ダウンロードしたデータを確認・プロット
+- `spacetracktest3.ipynb` ダウンロードしたデータを確認・プロット
+- `spacetracktest3-gp.ipynb` ダウンロードしたデータを確認・プロット (gp_history API)
+- `spacetracktest4.ipynb` 大量の軌道要素ファイルをまとめて取り扱いやすくするテスト
 - `dbtest1.ipynb` SQLite3格納のテスト
 
