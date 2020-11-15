@@ -67,4 +67,4 @@ JSONファイルから、TLEを取り出す。JSONファイルは圧縮されて
 - `spacetracktest3-gp.ipynb` ダウンロードしたデータを確認・プロット (gp_history API)
 - `spacetracktest4.ipynb` 大量の軌道要素ファイルをまとめて取り扱いやすくするテスト
 - `dbtest1.ipynb` SQLite3格納のテスト
-
+- `create_daily_data.ipynb` 日々の軌道高度データを作成する
