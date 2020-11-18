@@ -31,7 +31,7 @@ def getdata(st, norad_cat_id, logger = None):
         getdata.lasttime = time.monotonic()
 
         try:
-            data = st.tle(norad_cat_id=norad_cat_id, orderby=['norad_cat_id', 'epoch'], format='json')
+            data = st.gp_history(norad_cat_id=norad_cat_id, orderby=['norad_cat_id', 'epoch'], format='json')
 
         except requests.HTTPError as e:
             # Critical error. Don't retry
