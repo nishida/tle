@@ -14,29 +14,28 @@ space-track.org から軌道要素データを取得する。
 
 #### Satellite Catalog Number を指定して取得
 
-tle API を用いて衛星番号30000の過去の軌道要素データをJSON形式で取得する:
+gp_history API を用いて衛星番号30000の過去の軌道要素データをJSON形式で取得する:
 
-    $ ./download_tle_satcat_json.py
+    $ ./download_gp_id.py
 
 衛星番号30000から30029までの軌道要素データを順番に取得する:
 
-    $ ./download_tle_satcat_json.py 30000 30029
+    $ ./download_gp_id.py 30000 30029
 
 1リクエストで10個の衛星の軌道要素データを取得することで、リクエスト回数を減らす:
 
-    $ ./download_tle_satcat_json.py 30000 30029 10
+    $ ./download_gp_id.py 30000 30029 10
 
 ただし、リクエスト1回あたりのデータ量が多すぎるとエラーとなる。
 
-#### EPOCHの日付を指定して取得
+#### 日付を指定して取得
 
 gp_history API を用いてEPOCHが2019年1月12日から18日までの全ての軌道要素データをJSON形式で取得する:
 
-    $ ./download_gp_date_json.py 2019/1/12 2019/1/18
+    $ ./download_gp_date.py 2019/1/12 2019/1/18
 
 上記の例ではクエリの都合上、もし、EPOCH が2019/1/19 00:00:00.000000 のデータが存在した場合、それも含まれることに注意。
-
-gp_history API と tle API を使った場合とでは項目名が一部異なる。
+`-c` オプションをつけると、EPOCH の代わりに CREATION_DATE を用いる。
 
 #### CSVに変換
 

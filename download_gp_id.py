@@ -3,11 +3,10 @@
 
 import spacetrack.operators as op
 from spacetrack import SpaceTrackClient
-from dateutil import parser
-from datetime import datetime, timedelta
 import time
 import sys
 import math
+import argparse
 import subprocess
 from subprocess import PIPE
 import requests
@@ -19,10 +18,10 @@ MAX_RETRY = 2
 # Limit API queries to less than 30 requests per minute / 300 requests per hour
 MIN_INTERVAL = 12 # sec
 
-def getdata(st, epoch, logger = None):
+def getdata(st, norad_cat_id, logger = None):
     for i in range(MAX_RETRY + 1):
         if i > 0:
-            logger.warning('Retry {}/{} for {}'.format(i, MAX_RETRY, epoch))
+            logger.warning('Retry {}/{} for NORAD Catalog Number {}'.format(i, MAX_RETRY, norad_cat_id))
             logger.debug('Sleep: %f secs', MIN_INTERVAL * 2 ** i)
             time.sleep(MIN_INTERVAL * 2 ** i)
         elif getdata.lasttime > 0:
@@ -33,7 +32,7 @@ def getdata(st, epoch, logger = None):
         getdata.lasttime = time.monotonic()
 
         try:
-            data = st.gp_history(epoch=epoch, orderby=['norad_cat_id', 'epoch'], format='json')
+            data = st.gp_history(norad_cat_id=norad_cat_id, orderby=['norad_cat_id', 'epoch'], format='json')
 
         except requests.HTTPError as e:
             # Critical error. Don't retry
@@ -49,7 +48,7 @@ def getdata(st, epoch, logger = None):
         else:
             # Success
             logger.debug('Response Time: %f secs', time.monotonic() - getdata.lasttime)
-            return data 
+            return data
 
     return None
 
@@ -71,37 +70,27 @@ def savedata(data, filename, compress = True, logger = None):
         return True
 
 def main():
-    logger = setup_logger('download_gp_date_json')
+    logger = setup_logger('download_tle_satcat_json')
 
-    if len(sys.argv) == 4:
-        start = parser.parse(sys.argv[1], yearfirst=True)
-        end = parser.parse(sys.argv[2], yearfirst=True)
-        unit = int(sys.argv[3])
-    elif len(sys.argv) == 3:
-        start = parser.parse(sys.argv[1], yearfirst=True)
-        end = parser.parse(sys.argv[2], yearfirst=True)
-        unit = 1
-    elif len(sys.argv) == 2:
-        start = parser.parse(sys.argv[1], yearfirst=True)
-        end = start
-        unit = 1
-    else:
-        logger.critical('Invalid number of arguments!')
-        print('Usage: {} YYYY-MM-DD [YYYY-MM-DD [Days]]'.format(sys.argv[0]))
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description='Download GP data of specified NORAD Catalog Number.')
+    parser.add_argument('START', type=int, help='Start Catalog Number.')
+    parser.add_argument('END', type=int, nargs='?', help='End Catalog Number. Default: same as START')
+    parser.add_argument('CHUNK', type=int, nargs='?', default=1, help='Chunk size. Default: 1')
+    args = parser.parse_args()
 
-    start = datetime(start.year, start.month, start.day)
-    end = datetime(end.year, end.month, end.day)
-    
+    start = args.START
+    end = args.END if args.END is not None else start
+    unit = args.CHUNK
+
     if end < start:
         start, end = end, start
 
-    ndays = (end - start).days + 1
-    nfiles = math.ceil(ndays / unit)
+    nsats = end - start + 1
+    nfiles = math.ceil(nsats / unit)
 
-    logger.info('Start: ' +  start.strftime('%Y-%m-%d'))
-    logger.info('End: ' + end.strftime('%Y-%m-%d'))
-    logger.info('Number of Days: {}'.format(str(ndays)))
+    logger.info('Start: {}'.format(start))
+    logger.info('End: {}'.format(end))
+    logger.info('Number of Satellites: {}'.format(nsats))
     logger.info('Number of Files: {}'.format(nfiles))
 
     st = SpaceTrackClient(spacetrackaccount.userid, spacetrackaccount.password)
@@ -112,30 +101,29 @@ def main():
     error_count = 0
 
     for i in range(0, nfiles):
-        day1 = start + timedelta(days = i * unit)
-        day2 = min(day1 + timedelta(days = unit - 1), end)
-        epoch = op.inclusive_range(day1.strftime('%Y-%m-%d'), (day2 + timedelta(days = 1)).strftime('%Y-%m-%d'))
+        id1 = start + i * unit
+        id2 = min(start + (i + 1) * unit - 1, end)
 
-        if day1 == day2:
-            epoch_to_show = day1.strftime('%Y-%m-%d')
-            filename = 'download/{}.json'.format(day1.strftime('%Y%m%d'))
+        if id1 == id2:
+            norad_cat_id = id1
+            filename = 'download/{}.json'.format(norad_cat_id)
         else:
-            epoch_to_show = '{}--{}'.format(day1.strftime('%Y-%m-%d'), day2.strftime('%Y-%m-%d'))
-            filename = 'download/{}-{}.json'.format(day1.strftime('%Y%m%d'), day2.strftime('%Y%m%d'))
+            norad_cat_id = op.inclusive_range(id1, id2)
+            filename = 'download/{}-{}.json'.format(id1, id2)
 
-        logger.info('Downloading {} ({}/{})'.format(epoch_to_show, i + 1, nfiles))
+        logger.info('Downloading NORAD Catalog Number {} ({}/{})'.format(norad_cat_id, i + 1, nfiles))
 
-        data = getdata(st, epoch, logger = logger)
-    
+        data = getdata(st, norad_cat_id, logger=logger)
+
         if data is None:
-            logger.error("Error: Fail to download data for " + epoch_to_show)
+            logger.error("Error: Fail to download data for NORAD Catalog Number {}".format(norad_cat_id))
             error_count += 1
         else:
             tsize += len(data)
             tfiles += 1
             result = savedata(data, filename, logger = logger)
             if not result:
-                logger.error("Error: Fail to save data for {}".format(epoch_to_show))
+                logger.error("Error: Fail to save data for NORAD Catalog Number {}".format(norad_cat_id))
                 error_count += 1
 
         if error_count >= MAX_ERROR:
