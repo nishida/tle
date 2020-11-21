@@ -109,9 +109,13 @@ def main():
         try:
             df = pd.read_parquet(infile, columns = columns_out)
         except OSError as e:
-            df = (pd.read_json(infile, convert_dates = convert_dates, dtype = dtype, precise_float = True, orient = 'records'))[columns_out]
+            df = pd.read_json(infile, convert_dates = convert_dates, dtype = dtype, precise_float = True, orient = 'records')
+            if len(df) != 0:
+                df = df[columns_out]
 
         logger.debug('{} records read'.format(len(df)))
+        if len(df) == 0:
+            continue
         df['CREATION_DATE'] = df['CREATION_DATE'].astype(str)
         df['EPOCH'] = df['EPOCH'].astype(str)
         cur.executemany(insert_record, df.values.tolist())
