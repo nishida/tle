@@ -77,7 +77,7 @@ def savedata(data, filename, compress = True, logger = None):
         return True
 
 def main():
-    logger = setup_logger('download_gp_date_json')
+    logger = setup_logger('download_gp_date')
 
     parser = argparse.ArgumentParser(description='Download GP data of specified date.')
     parser.add_argument('START', type=str, help='Start Date (YYYY-MM-DD).')

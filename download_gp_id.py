@@ -70,7 +70,7 @@ def savedata(data, filename, compress = True, logger = None):
         return True
 
 def main():
-    logger = setup_logger('download_tle_satcat_json')
+    logger = setup_logger('download_gp_id')
 
     parser = argparse.ArgumentParser(description='Download GP data of specified NORAD Catalog Number.')
     parser.add_argument('START', type=int, help='Start Catalog Number.')
