@@ -4,6 +4,7 @@ space-track.org から軌道要素データを取得する。
 
 ## 環境
 - Python 3.7以降
+- SQLite 3.24以降
 - pandas, spacetrack
 - (Jupyter Notebook の各ファイルを実行するには) sgp4, xmljson, pyarrow, tables
 
@@ -49,7 +50,16 @@ JSONファイルをCSVファイルに変換する。JSONファイルは圧縮さ
 
 複数のJSONファイルを `pandas.DataFrame` として読み込み、Parquetファイルに変換する。JSONファイルは圧縮されていても可。出力されるファイルは最後に指定する。Parquet ファイルの圧縮方法は `-c` オプションで指定でき、`pandas.DataFrame.to_parquet` がサポートする圧縮方式をサポートする(デフォルトは snappy)。
 
-    $ ./json2parquet.py -c zstd download/*.json.xz out.parquet.zstd
+    $ ./json2parquet.py -c zstd download/*.json.xz out.parquet
+
+#### データを SQLite3 データベースに格納する
+
+注: gp, gp_latest APIでダウンロードしたJSONファイルのみに対応
+
+複数のJSONファイルまたは`json2parquet.py` で作成した複数のParquetファイルを、SQLite3 データベースに格納する。PRIMARY KEY は `GP_ID`。既にテーブルが存在している場合にはUPSERTを行う。JSONファイルは圧縮されていても可。テーブル名は最後に指定する。
+
+    $ ./json2sqlite3.py download/*.json.xz out.sqlite3 table
+    $ ./json2sqlite3.py download/*.parquet out.sqlite3 table
 
 #### TLEを取り出す
 
@@ -66,4 +76,5 @@ JSONファイルから、TLEを取り出す。JSONファイルは圧縮されて
 - `spacetracktest3-gp.ipynb` ダウンロードしたデータを確認・プロット (gp_history API)
 - `spacetracktest4.ipynb` 大量の軌道要素ファイルをまとめて取り扱いやすくするテスト
 - `dbtest1.ipynb` SQLite3格納のテスト
+- `dbtest2.ipynb` SQLite3格納のテスト (多数のデータでテスト)
 - `create_daily_data.ipynb` 日々の軌道高度データを作成する
