@@ -63,6 +63,7 @@ def main():
     parser.add_argument('-t', '--with_tle', action='store_true', help='Include TLE lines')
     parser.add_argument('-d', '--drop_table', action='store_true', help='Drop table if exists')
     parser.add_argument('-i', '--drop_index', action='store_true', help='Drop index temporarily before insert records')
+    parser.add_argument('-r', '--replace_record', action='store_true', help='Use REPLACE statment instead of UPSERT')
 
     args = parser.parse_args()
 
@@ -72,17 +73,19 @@ def main():
     with_tle = args.with_tle
     drop_table = args.drop_table
     drop_index = args.drop_index
+    replace_record = args.replace_record
 
     columns_out = columns_out_with_tle if with_tle else columns_out_without_tle
     create_table = create_table_with_tle.format(table) if with_tle else create_table_without_tle.format(table)
 
     version = sqlite3.sqlite_version.split('.')
-    if int(version[0]) > 3 or (int(version[0]) == 3 and int(version[1]) >=24):
-        # SQLite3 3.24以降ではUPSERTを使う
+    if not replace_record and (int(version[0]) > 3 or (int(version[0]) == 3 and int(version[1]) >=24)):
+        # SQLite3 3.24以降ではUPSERT (ON CONFLICT句) を使う
         insert_record = insert_record_with_tle.format(table) if with_tle else insert_record_without_tle.format(table)
     else:
-        # 古い SQLite3 ではREPLACEを使う
-        logger.warning("SQLite3 version {} doesn't support UPSERT. REPLACE is used.".format(version))
+        # 古い SQLite3 の場合と、--replace_record が指定された場合にはREPLACEを使う
+        if not replace_record:
+            logger.warning("SQLite3 version {} doesn't support UPSERT. REPLACE is used.".format(sqlite3.sqlite_version))
         insert_record = insert_record_with_tle_compat.format(table) if with_tle else insert_record_without_tle_compat.format(table)
 
     logger.debug("connecting to {}".format(dbfile))
