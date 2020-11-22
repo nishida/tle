@@ -67,6 +67,12 @@ JSONファイルから、TLEを取り出す。JSONファイルは圧縮されて
 
     $ ./json2tle.py 2020-10-10.json.xz
 
+#### 衛星情報を取得
+
+satcat API を用いて Satellite Catalog (SATCAT) データを JSON 形式で取得する。
+
+    $ ./download_satcat.py
+
 #### Jupyter Notebookでいろいろテスト
 
 - `spacetracktest1.ipynb` tle, tle_latest APIを用いたダウンロードのテスト
