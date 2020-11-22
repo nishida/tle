@@ -58,8 +58,8 @@ JSONファイルをCSVファイルに変換する。JSONファイルは圧縮さ
 
 複数のJSONファイルまたは`json2parquet.py` で作成した複数のParquetファイルを、SQLite3 データベースに格納する。PRIMARY KEY は `GP_ID`。既にテーブルが存在している場合にはUPSERTを行う。JSONファイルは圧縮されていても可。テーブル名は最後に指定する。
 
-    $ ./json2sqlite3.py download/*.json.xz out.sqlite3 table
-    $ ./json2sqlite3.py download/*.parquet out.sqlite3 table
+    $ ./json2sqlite3.py download/*.json.xz out.sqlite3 elset
+    $ ./json2sqlite3.py download/*.parquet out.sqlite3 elset
 
 #### TLEを取り出す
 
@@ -71,7 +71,11 @@ JSONファイルから、TLEを取り出す。JSONファイルは圧縮されて
 
 satcat API を用いて Satellite Catalog (SATCAT) データを JSON 形式で取得する。
 
-    $ ./download_satcat.py
+    $ ./download_satcat.py -o satcat.json
+
+SQLite3 データベースに格納する。テーブル名は最後に指定する。
+
+    $ ./satcat2sqlite3.py satcat.json.xz out.sqlite3 satcat
 
 #### Jupyter Notebookでいろいろテスト
 
