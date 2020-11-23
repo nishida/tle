@@ -12,12 +12,12 @@ def main():
     logger = setup_logger('satcat2qlite3')
 
     # JSONの各カラムの型 (https://www.space-track.org/basicspacedata/modeldef/class/satcat/format/html)
-    dtype = {'INTLDES': str, 'NORAD_CAT_ID': 'uint32', 'OBJECT_TYPE': str, 'SATNAME': str,
-        'COUNTRY': str, 'LAUNCH': 'datetime64[ns]', 'SITE': str, 'DECAY': 'datetime64[ns]',
+    dtype = {'INTLDES': object, 'NORAD_CAT_ID': 'uint32', 'OBJECT_TYPE': object, 'SATNAME': object,
+        'COUNTRY': object, 'LAUNCH': 'datetime64[ns]', 'SITE': object, 'DECAY': 'datetime64[ns]',
         'PERIOD': 'float64', 'INCLINATION': 'float64', 'APOGEE': 'uint64', 'PERIGEE': 'uint64',
-        'COMMENT': str, 'COMMENTCODE': 'uint8', 'RCSVALUE': 'int32', 'RCS_SIZE': str,
-        'FILE': 'uint16', 'LAUNCH_YEAR': 'uint16', 'LAUNCH_NUM': 'uint16', 'LAUNCH_PIECE': str,
-        'CURRENT': str, 'OBJECT_NAME': str, 'OBJECT_ID': str, 'OBJECT_NUMBER': 'uint32'}
+        'COMMENT': object, 'COMMENTCODE': 'uint8', 'RCSVALUE': 'int32', 'RCS_SIZE': object,
+        'FILE': 'uint16', 'LAUNCH_YEAR': 'uint16', 'LAUNCH_NUM': 'uint16', 'LAUNCH_PIECE': object,
+        'CURRENT': object, 'OBJECT_NAME': object, 'OBJECT_ID': object, 'OBJECT_NUMBER': 'uint32'}
 
     # JSONで日時として扱うカラム
     convert_dates = ['LAUNCH', 'DECAY']

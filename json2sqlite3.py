@@ -12,16 +12,16 @@ def main():
     logger = setup_logger('json2sqlite3')
 
     # JSONの各カラムの型
-    dtype = {'CCSDS_OMM_VERS': str,  'COMMENT': str,  'CREATION_DATE': 'datetime64[ns]',  'ORIGINATOR': str, 
-           'OBJECT_NAME': str,  'OBJECT_ID': str,  'CENTER_NAME': str,  'REF_FRAME': str, 
-           'TIME_SYSTEM': str,  'MEAN_ELEMENT_THEORY': str,  'EPOCH': 'datetime64[ns]',  'MEAN_MOTION': 'float64', 
+    dtype = {'CCSDS_OMM_VERS': object,  'COMMENT': object,  'CREATION_DATE': 'datetime64[ns]',  'ORIGINATOR': object, 
+           'OBJECT_NAME': object,  'OBJECT_ID': object,  'CENTER_NAME': object,  'REF_FRAME': object, 
+           'TIME_SYSTEM': object,  'MEAN_ELEMENT_THEORY': object,  'EPOCH': 'datetime64[ns]',  'MEAN_MOTION': 'float64', 
            'ECCENTRICITY': 'float64',  'INCLINATION': 'float64',  'RA_OF_ASC_NODE': 'float64', 
            'ARG_OF_PERICENTER': 'float64',  'MEAN_ANOMALY': 'float64',  'EPHEMERIS_TYPE': 'int8', 
-           'CLASSIFICATION_TYPE': str,  'NORAD_CAT_ID': 'uint32',  'ELEMENT_SET_NO': 'uint16', 
+           'CLASSIFICATION_TYPE': object,  'NORAD_CAT_ID': 'uint32',  'ELEMENT_SET_NO': 'uint16', 
            'REV_AT_EPOCH': 'uint32',  'BSTAR': 'float64',  'MEAN_MOTION_DOT': 'float64',  'MEAN_MOTION_DDOT': 'float64', 
-           'SEMIMAJOR_AXIS': 'float64',  'PERIOD': 'float64',  'APOAPSIS': 'float64',  'PERIAPSIS': 'float64',  'OBJECT_TYPE': str, 
-           'RCS_SIZE': str,  'COUNTRY_CODE': str,  'LAUNCH_DATE': 'datetime64[ns]',  'SITE': str,  'DECAY_DATE': 'datetime64[ns]', 
-           'FILE': 'uint64',  'GP_ID': 'uint32',  'TLE_LINE0': str,  'TLE_LINE1': str,  'TLE_LINE2': str}
+           'SEMIMAJOR_AXIS': 'float64',  'PERIOD': 'float64',  'APOAPSIS': 'float64',  'PERIAPSIS': 'float64',  'OBJECT_TYPE': object, 
+           'RCS_SIZE': object,  'COUNTRY_CODE': object,  'LAUNCH_DATE': 'datetime64[ns]',  'SITE': object,  'DECAY_DATE': 'datetime64[ns]', 
+           'FILE': 'uint64',  'GP_ID': 'uint32',  'TLE_LINE0': object,  'TLE_LINE1': object,  'TLE_LINE2': object}
 
     # JSONで日時として扱うカラム
     convert_dates = ['EPOCH', 'CREATION_DATE', 'LAUNCH_DATE', 'DECAY_DATE']
