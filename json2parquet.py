@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser(description='Convert JSON to Parquet.')
 
 parser.add_argument('JSON_file', type=str, nargs='+', help='Input JSON files.')
 parser.add_argument('Parquet_file', type=str, nargs=1, help='Output Parquet file.')
-parser.add_argument('-c', '--compression', type=str, default='snappy', help='Name of the compression to use. Use None for no compression.')
+parser.add_argument('-c', '--compression', type=str, default='zstd', help='Name of the compression to use. Use None for no compression. Default: zstd')
 
 args = parser.parse_args()
 

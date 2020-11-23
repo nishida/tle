@@ -48,7 +48,7 @@ JSONファイルをCSVファイルに変換する。JSONファイルは圧縮さ
 
 注: gp, gp_latest APIでダウンロードしたJSONファイルのみに対応
 
-複数のJSONファイルを `pandas.DataFrame` として読み込み、Parquetファイルに変換する。JSONファイルは圧縮されていても可。出力されるファイルは最後に指定する。Parquet ファイルの圧縮方法は `-c` オプションで指定でき、`pandas.DataFrame.to_parquet` がサポートする圧縮方式をサポートする(デフォルトは snappy)。
+複数のJSONファイルを `pandas.DataFrame` として読み込み、Parquetファイルに変換する。JSONファイルは圧縮されていても可。出力されるファイルは最後に指定する。Parquet ファイルの圧縮方法は `-c` オプションで指定でき、`pandas.DataFrame.to_parquet` がサポートする圧縮方式をサポートする(デフォルトは zstd)。
 
     $ ./json2parquet.py -c zstd download/*.json.xz out.parquet
 
