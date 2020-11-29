@@ -6,6 +6,7 @@ from spacetrack import SpaceTrackClient
 from datetime import datetime
 import time
 import sys
+import os
 import math
 import argparse
 import subprocess
@@ -57,14 +58,20 @@ def getdata(st, norad_cat_id = None, logger = None):
 
 getdata.lasttime = 0
 
-def savedata(data, filename, compress = True, logger = None):
+def savedata(data, filename, compress = True, force = False, logger = None):
+    if os.path.exists(filename) and not force:
+        logger.error(filename + ' already exists')
+        return False
+
     with open(filename, 'w') as fp:
         fp.write(data)
 
     if not compress:
         return True
-
-    proc = subprocess.Popen(['xz', '-9', filename], stdout=PIPE, stderr=PIPE, text=True)
+    program = ['xz', '-9', filename]
+    if force:
+        program.insert(1, '-f')
+    proc = subprocess.Popen(program, stdout=PIPE, stderr=PIPE, text=True)
     (stdout, stderr) = proc.communicate()
     if stdout != '' or stderr != '':
         logger.error(stdout + stderr)
@@ -78,7 +85,9 @@ def main():
     parser = argparse.ArgumentParser(description='Download SATCAT data of specified NORAD Catalog Number.')
     parser.add_argument('CAT_ID', type=str, nargs='*', help='NORAD Catalog Number.')
     parser.add_argument('-o', '--output', type=str, help='Output file.')
+    parser.add_argument('-f', '--force', action='store_true', help='If the outpu file already exists, overwrite it.')
     args = parser.parse_args()
+    force = args.force
 
     norad_cat_id = op._stringify_predicate_value(args.CAT_ID)
 
@@ -108,7 +117,7 @@ def main():
     else:
         tsize += len(data)
         tfiles += 1
-        result = savedata(data, filename, logger = logger)
+        result = savedata(data, filename, force = force, logger = logger)
         if not result:
             logger.error("Error: Fail to save data")
             error_count += 1

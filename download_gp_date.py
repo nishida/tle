@@ -7,6 +7,7 @@ import dateutil.parser
 from datetime import datetime, timedelta
 import time
 import sys
+import os
 import math
 import argparse
 import subprocess
@@ -61,14 +62,21 @@ def getdata(st, epoch, date_type = 'EPOCH', logger = None):
 
 getdata.lasttime = 0
 
-def savedata(data, filename, compress = True, logger = None):
+def savedata(data, filename, compress = True, force = False, logger = None):
+    if os.path.exists(filename) and not force:
+        logger.error(filename + ' already exists')
+        return False
+
     with open(filename, 'w') as fp:
         fp.write(data)
 
     if not compress:
         return True
 
-    proc = subprocess.Popen(['xz', '-9', filename], stdout=PIPE, stderr=PIPE, text=True)
+    program = ['xz', '-9', filename]
+    if force:
+        program.insert(1, '-f')
+    proc = subprocess.Popen(program, stdout=PIPE, stderr=PIPE, text=True)
     (stdout, stderr) = proc.communicate()
     if stdout != '' or stderr != '':
         logger.error(stdout + stderr)
@@ -84,12 +92,14 @@ def main():
     parser.add_argument('END', type=str, nargs='?', help='End Date (YYYY-MM-DD). Default: same as START')
     parser.add_argument('CHUNK', type=int, nargs='?', default=1, help='Chunk size (days). Default: 1')
     parser.add_argument('-c', '--creationdate', action='store_true', help='Use CREATION_DATE intead of EPOCH')
+    parser.add_argument('-f', '--force', action='store_true', help='If the outpu file already exists, overwrite it.')
     args = parser.parse_args()
 
     start = dateutil.parser.parse(args.START, yearfirst=True)
     end = dateutil.parser.parse(args.END, yearfirst=True) if args.END is not None else start
     unit = args.CHUNK
     date_type = 'EPOCH' if not args.creationdate else 'CREATION_DATE'
+    force = args.force
 
     start = datetime(start.year, start.month, start.day)
     end = datetime(end.year, end.month, end.day)
@@ -134,7 +144,7 @@ def main():
         else:
             tsize += len(data)
             tfiles += 1
-            result = savedata(data, filename, logger = logger)
+            result = savedata(data, filename, force = force, logger = logger)
             if not result:
                 logger.error("Error: Fail to save data for {}".format(epoch_to_show))
                 error_count += 1
