@@ -53,7 +53,7 @@ def main():
     insert_record_with_tle_compat = '''REPLACE INTO {} VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'''
 
     # indexをつけるカラム
-    columns_with_index = ['EPOCH', 'NORAD_CAT_ID']
+    columns_with_index = ['CREATION_DATE', 'EPOCH', 'NORAD_CAT_ID']
 
     parser = argparse.ArgumentParser(description='Convert JSON or Parquet to SQLite3.')
 
